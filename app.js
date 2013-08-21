@@ -30,21 +30,22 @@ function writeCache(path, string, callback) {
 var app;
 app = http.createServer(function (req, res) {
 	var url = req.url.slice(1);
-	var realPath = (config.staticPath + url).split('?')[0];
+	var vendorPath = (config.staticPath + url).split('?')[0];
+	var cachePath = (config.cachePath + url).split('?')[0];
 	var jslist = url.split('.')[0].split('-');
 	if (url.indexOf('?debug') > -1) {
 		debugDo(jslist, function (s) {
 			res.end(s);
 		});
 	} else {
-		fs.exists(realPath, function (exists) {
+		fs.exists(cachePath, function (exists) {
 			if (exists) {
 				console.log('from cache');
-				res.end(fs.readFileSync(realPath));
+				res.end(fs.readFileSync(cachePath));
 			} else {
 				combo(jslist, function (s) {
 					var minCode = minjs(s);
-					writeCache(realPath, minCode, function () {
+					writeCache(cachePath, minCode, function () {
 						console.log('from uglify');
 						res.end(minCode);
 					});
